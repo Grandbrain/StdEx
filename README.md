@@ -6,7 +6,7 @@
 
 # Welcome to StdEx project!
 
-[StdEx](https://github.com/Grandbrain/StdEx) is an extension of the standard C++ library that includes powerful and lightweight classes and functions to simplify the development of complex projects. This library uses the new features of modern C++ standards and can work on most modern compilers.
+[StdEx](https://github.com/Grandbrain/StdEx) is an extension of the standard C++ library. This library includes powerful and lightweight classes and functions to simplify the development of complex projects. The library uses the new features of modern C++ standards and can work on most modern compilers.
 
 ## Contribute
 
