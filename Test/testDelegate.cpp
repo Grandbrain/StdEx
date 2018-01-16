@@ -1,5 +1,6 @@
 #include <catch.hpp>
 #include <delegate.h>
+#include <iostream>
 
 /**
  * Simple function for testing purposes.
@@ -43,5 +44,28 @@ TEST_CASE("Delegate testing") {
     SECTION("Delegates with free functions") {
         auto c = stdex::delegate<int()>::create<&data>();
         REQUIRE(c() == 3);
+    }
+
+    /**
+     * Testing equality operators.
+     */
+    SECTION("Equality operators") {
+        A object;
+        auto a = stdex::delegate<int()>::create<A, &A::data1>(object);
+        auto b = stdex::delegate<int()>::create<A, &A::data1>(object);
+        REQUIRE(a == b);
+    }
+
+    /**
+     * Testing multicast delegates.
+     */
+    SECTION("Multicast delegates") {
+        auto a = stdex::delegate<int()>::create<&data>();
+        auto b = stdex::delegate<int()>::create<&data>();
+        stdex::multicast_delegate<int()> ab;
+        ab += a;
+        ab += b;
+        ab();
+        REQUIRE(ab.size() == 2);
     }
 }
