@@ -1,8 +1,7 @@
 .idea/
 .idea_modules/
 out/
-build/
-Build/
+[Bb]uild/
 *.iws
 atlassian-ide-plugin.xml
 com_crashlytics_export_strings.xml
