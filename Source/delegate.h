@@ -337,8 +337,8 @@ namespace stdex {
          */
         multicast_delegate& operator-=(const multicast_delegate& other) {
             for (const auto& invocation : other.invocations_) {
-                auto iterator = std::find(invocations_.cbegin(),
-                                          invocations_.cend(), invocation);
+                auto iterator = std::find(invocations_.begin(),
+                                          invocations_.end(), invocation);
 
                 if (iterator != invocations_.end())
                     invocations_.erase(iterator);
@@ -352,10 +352,10 @@ namespace stdex {
          * @return This object.
          */
         multicast_delegate& operator-=(const delegate<R(P...)>& other) {
-            auto iterator = std::find(invocations_.cbegin(),
-                                      invocations_.cend(), other.invocation_);
+            auto iterator = std::find(invocations_.begin(),
+                                      invocations_.end(), other.invocation_);
 
-            if (iterator != invocations_.cend())
+            if (iterator != invocations_.end())
                 invocations_.erase(iterator);
 
             return *this;
