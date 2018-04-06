@@ -47,12 +47,36 @@ namespace stdex {
              * @param object Object pointer.
              * @param function Function pointer.
              */
-            invocation(void* object, function_type function) noexcept
+            invocation(void* object, const function_type function) noexcept
                     : object_(object), function_(function) {
             }
 
             /**
-             * Indicates if objects are equal.
+             * Boolean operator.
+             * @return True if function pointer is not null and false otherwise.
+             */
+            explicit operator bool() const noexcept {
+                return !empty();
+            }
+
+            /**
+             * Equality operator.
+             * @return True if function pointer is null and false otherwise.
+             */
+            bool operator==(std::nullptr_t) const noexcept {
+                return empty();
+            }
+
+            /**
+             * Equality operator.
+             * @return True if function pointer is not null and false otherwise.
+             */
+            bool operator!=(std::nullptr_t) const noexcept {
+                return !(*this == nullptr);
+            }
+
+            /**
+             * Equality operator.
              * @param other Object to compare.
              * @return True if objects are equal and false otherwise.
              */
@@ -61,12 +85,20 @@ namespace stdex {
             }
 
             /**
-             * Indicates if objects aren't equal.
+             * Equality operator.
              * @param other Object to compare.
              * @return True if objects aren't equal and false otherwise.
              */
             bool operator!=(const invocation& other) const noexcept {
                 return !(*this == other);
+            }
+
+            /**
+             * Indicates if function pointer is null.
+             * @return True if function pointer is null and false otherwise.
+             */
+            bool empty() const noexcept {
+                return function_ == nullptr;
             }
 
             /**
@@ -115,7 +147,7 @@ namespace stdex {
      * @tparam T Object type.
      */
     template <typename T>
-    class multicast_delegate;
+    class multidelegate;
 
 
     /**
@@ -124,7 +156,7 @@ namespace stdex {
      * @tparam P Parameter type.
      */
     template <typename R, typename ...P>
-    class delegate<R(P...)> final : private delegate_base<R(P...)> {
+    class delegate<R(P...)> final : delegate_base<R(P...)> {
     public:
 
         /**
@@ -135,11 +167,50 @@ namespace stdex {
         }
 
         /**
+         * Constructor with the lambda object.
+         * @tparam L Lambda type.
+         * @param object Object.
+         */
+        template<typename L>
+        delegate(const L& object) noexcept
+                : invocation_((void*)&object, lambda<L>) {
+        }
+
+        /**
+         * Assignment operator with the lambda object.
+         * @tparam L Lambda type.
+         * @param object Object.
+         * @return
+         */
+        template<typename L>
+        delegate& operator=(const L& object) noexcept {
+            invocation_ = typename delegate_base<R(P...)>::invocation(
+                    (void*)&object, lambda<L>);
+            return *this;
+        }
+
+        /**
          * Boolean operator.
-         * @return True if function pointer not null and false otherwise.
+         * @return True if function pointer is not null and false otherwise.
          */
         explicit operator bool() const noexcept {
-            return invocation_.function() != nullptr;
+            return !empty();
+        }
+
+        /**
+         * Equality operator.
+         * @return True if function pointer is null and false otherwise.
+         */
+        bool operator==(std::nullptr_t) const noexcept {
+            return empty();
+        }
+
+        /**
+         * Equality operator.
+         * @return True if function pointer is not null and false otherwise.
+         */
+        bool operator!=(std::nullptr_t) const noexcept {
+            return !(*this == nullptr);
         }
 
         /**
@@ -157,7 +228,25 @@ namespace stdex {
          * @return True if objects aren't equal and false otherwise.
          */
         bool operator!=(const delegate& other) const noexcept {
-            return invocation_ != other.invocation_;
+            return !(*this == other);
+        }
+
+        /**
+         * Equality operator.
+         * @param other Object to compare.
+         * @return True if objects are equal and false otherwise.
+         */
+        bool operator==(const multidelegate<R(P...)>& other) const noexcept {
+            return other == *this;
+        }
+
+        /**
+         * Equality operator.
+         * @param other Object to compare.
+         * @return True if objects aren't equal and false otherwise.
+         */
+        bool operator!=(const multidelegate<R(P...)>& other) const noexcept {
+            return other != *this;
         }
 
         /**
@@ -170,13 +259,21 @@ namespace stdex {
         }
 
         /**
+         * Indicates if function pointer is null.
+         * @return True if function pointer is null and false otherwise.
+         */
+        bool empty() const noexcept {
+            return !invocation_;
+        }
+
+        /**
          * Returns a delegate that points to a member function.
          * @tparam T Object type.
          * @tparam M Member function.
          * @param object Object.
          * @return Delegate that points to a member function.
          */
-        template <typename T, R(T::*M)(P...)>
+        template<typename T, R(T::*M)(P...)>
         static delegate create(T& object) noexcept {
             return delegate(&object, method<T, M>);
         }
@@ -188,7 +285,7 @@ namespace stdex {
          * @param object Object.
          * @return Delegate that points to a const member function.
          */
-        template <typename T, R(T::*M)(P...) const>
+        template<typename T, R(T::*M)(P...) const>
         static delegate create(const T& object) noexcept {
             return delegate(const_cast<T*>(&object), const_method<T, M>);
         }
@@ -198,9 +295,20 @@ namespace stdex {
          * @tparam M Free function.
          * @return Delegate that points to a free function.
          */
-        template <R(*M)(P...)>
+        template<R(* M)(P...)>
         static delegate create() noexcept {
             return delegate(nullptr, free_function<M>);
+        }
+
+        /**
+         * Returns a delegate that points to a lambda function.
+         * @tparam L Lambda type.
+         * @param object Object.
+         * @return Delegate that points to a lambda function.
+         */
+        template<typename L>
+        static delegate create(const L& object) noexcept {
+            return delegate((void*)&object, lambda<L>);
         }
 
     private:
@@ -212,7 +320,7 @@ namespace stdex {
          */
         delegate(void* object,
                  typename delegate_base<R(P...)>::function_type function)
-                noexcept : invocation_(object, function) {
+                 noexcept : invocation_(object, function) {
         }
 
         /**
@@ -223,10 +331,10 @@ namespace stdex {
          * @param args Arguments.
          * @return Return value of the function.
          */
-        template <typename T, R(T::*M)(P...)>
+        template<typename T, R(T::*M)(P...)>
         static R method(void* object, P... args) {
             return (static_cast<T*>(object)->*M)(args...);
-        };
+        }
 
         /**
          * Calls a const member function with the specified arguments.
@@ -236,10 +344,10 @@ namespace stdex {
          * @param args Arguments.
          * @return Return value of the function.
          */
-        template <typename T, R(T::*M)(P...) const>
+        template<typename T, R(T::*M)(P...) const>
         static R const_method(void* object, P... args) {
             return (static_cast<const T*>(object)->*M)(args...);
-        };
+        }
 
         /**
          * Calls a free function with the specified arguments.
@@ -248,12 +356,22 @@ namespace stdex {
          * @param args Arguments.
          * @return Return value of the function.
          */
-        template <R(*M)(P...)>
+        template<R(* M)(P...)>
         static R free_function(void* object, P... args) {
             return (M)(args...);
         }
 
-    private:
+        /**
+         * Calls a lambda function with the specified arguments.
+         * @tparam L Lambda type.
+         * @param object Object.
+         * @param args Arguments.
+         * @return Return value of the function.
+         */
+        template<typename L>
+        static R lambda(void* object, P... args) {
+            return (static_cast<L*>(object)->operator())(args...);
+        }
 
         /**
          * Storage of the pointers to an object and a function.
@@ -263,7 +381,7 @@ namespace stdex {
         /**
          * Friend class multicast delegate for member access.
          */
-        friend class multicast_delegate<R(P...)>;
+        friend class multidelegate<R(P...)>;
     };
 
 
@@ -273,22 +391,38 @@ namespace stdex {
      * @tparam P Parameter type.
      */
     template <typename R, typename ...P>
-    class multicast_delegate<R(P...)> final : private delegate_base<R(P...)> {
+    class multidelegate<R(P...)> final : delegate_base<R(P...)> {
     public:
 
         /**
          * Constructor without arguments.
          */
-        multicast_delegate() noexcept
+        multidelegate() noexcept
                 : invocations_() {
         }
 
         /**
          * Boolean operator.
-         * @return True if function pointer not null and false otherwise.
+         * @return True if invocations is not empty and false otherwise.
          */
         explicit operator bool() const noexcept {
-            return !invocations_.empty();
+            return !empty();
+        }
+
+        /**
+         * Equality operator.
+         * @return True if invocations is empty and false otherwise.
+         */
+        bool operator==(std::nullptr_t) const noexcept {
+            return empty();
+        }
+
+        /**
+         * Equality operator.
+         * @return True if invocations is not empty and false otherwise.
+         */
+        bool operator!=(std::nullptr_t) const noexcept {
+            return !(*this == nullptr);
         }
 
         /**
@@ -296,7 +430,7 @@ namespace stdex {
          * @param other Object to compare.
          * @return True if objects are equal and false otherwise.
          */
-        bool operator==(const multicast_delegate& other) const noexcept {
+        bool operator==(const multidelegate& other) const noexcept {
             return invocations_ == other.invocations_;
         }
 
@@ -305,8 +439,28 @@ namespace stdex {
          * @param other Object to compare.
          * @return True if objects aren't equal and false otherwise.
          */
-        bool operator!=(const multicast_delegate& other) const noexcept {
-            return invocations_ != other.invocations_;
+        bool operator!=(const multidelegate& other) const noexcept {
+            return !(*this == other);
+        }
+
+        /**
+         * Equality operator.
+         * @param other Object to compare.
+         * @return True if objects are equal and false otherwise.
+         */
+        bool operator==(const delegate<R(P...)>& other) const noexcept {
+            if (!(*this) && !other) return true;
+            if (size() != 1 || !other) return false;
+            return other.invocation_ == invocations_.front();
+        }
+
+        /**
+         * Equality operator.
+         * @param other Object to compare.
+         * @return True if objects aren't equal and false otherwise.
+         */
+        bool operator!=(const delegate<R(P...)>& other) const noexcept {
+            return !(*this == other);
         }
 
         /**
@@ -314,7 +468,7 @@ namespace stdex {
          * @param other Multicast delegate to add.
          * @return This object.
          */
-        multicast_delegate& operator+=(const multicast_delegate& other) {
+        multidelegate& operator+=(const multidelegate& other) {
             for(const auto& invocation : other.invocations_)
                 invocations_.push_back(invocation);
             return *this;
@@ -325,7 +479,7 @@ namespace stdex {
          * @param other Delegate to add.
          * @return This object.
          */
-        multicast_delegate& operator+=(const delegate<R(P...)>& other) {
+        multidelegate& operator+=(const delegate<R(P...)>& other) {
             if(other) invocations_.push_back(other.invocation_);
             return *this;
         }
@@ -335,7 +489,7 @@ namespace stdex {
          * @param other Multicast delegate to remove.
          * @return This object.
          */
-        multicast_delegate& operator-=(const multicast_delegate& other) {
+        multidelegate& operator-=(const multidelegate& other) {
             for (const auto& invocation : other.invocations_) {
                 auto iterator = std::find(invocations_.begin(),
                                           invocations_.end(), invocation);
@@ -351,7 +505,7 @@ namespace stdex {
          * @param other Delegate to remove.
          * @return This object.
          */
-        multicast_delegate& operator-=(const delegate<R(P...)>& other) {
+        multidelegate& operator-=(const delegate<R(P...)>& other) {
             auto iterator = std::find(invocations_.begin(),
                                       invocations_.end(), other.invocation_);
 
@@ -369,6 +523,31 @@ namespace stdex {
         void operator()(P... args) const {
             for(const auto& invocation : invocations_)
                 (*invocation.function())(invocation.object(), args...);
+        }
+
+        /**
+         * Function call operator.
+         * The returned parameters are handled by callback handler.
+         * @tparam H Handler type.
+         * @param args Possible arguments of the functions.
+         * @param handler Callback handler.
+         */
+        template <typename H, typename =
+            typename std::enable_if<!std::is_same<R, void>::value>::type>
+        void operator()(P... args, H handler) const {
+            std::size_t index = 0;
+            for(const auto& invocation : invocations_) {
+                R item = (*invocation.function())(invocation.object(), args...);
+                handler(index++, &item);
+            }
+        }
+
+        /**
+         * Indicates if invocations is empty.
+         * @return True if invocations is empty and false otherwise.
+         */
+        bool empty() const noexcept {
+            return invocations_.empty();
         }
 
         /**
