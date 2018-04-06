@@ -1,6 +1,5 @@
 #include <catch.hpp>
 #include <delegate.h>
-#include <iostream>
 
 /**
  * Simple function for testing purposes.
@@ -47,6 +46,14 @@ TEST_CASE("Delegate testing") {
     }
 
     /**
+     * Testing delegates with lambda functions.
+     */
+    SECTION("Delegates with lambda functions") {
+        stdex::delegate<int()> c = []() -> int {return 4;};
+        REQUIRE(c() == 4);
+    }
+
+    /**
      * Testing equality operators.
      */
     SECTION("Equality operators") {
@@ -60,12 +67,14 @@ TEST_CASE("Delegate testing") {
      * Testing multicast delegates.
      */
     SECTION("Multicast delegates") {
+        A object(1, 2);
         auto a = stdex::delegate<int()>::create<&data>();
-        auto b = stdex::delegate<int()>::create<&data>();
-        stdex::multicast_delegate<int()> ab;
+        auto b = stdex::delegate<int()>::create<A, &A::data1>(object);
+        stdex::multidelegate<int()> ab;
         ab += a;
         ab += b;
         ab();
+
         REQUIRE(ab.size() == 2);
     }
 }
