@@ -532,8 +532,7 @@ namespace stdex {
          * @param args Possible arguments of the functions.
          * @param handler Callback handler.
          */
-        template <typename H, typename =
-            typename std::enable_if<!std::is_same<R, void>::value>::type>
+        template <typename H>
         void operator()(P... args, H handler) const {
             std::size_t index = 0;
             for(const auto& invocation : invocations_) {
