@@ -149,8 +149,8 @@ namespace stdex {
         void assign(buffer&& other) noexcept {
             if (this != &other) {
                 std::swap(data_, other.data_);
-                size_ = other.size_;
-                capacity_ = other.capacity_;
+                std::swap(size_, other.size_);
+                std::swap(capacity_, other.capacity_);
                 other.clear();
             }
         }
@@ -251,10 +251,10 @@ namespace stdex {
 
             T* tmp = exceeds ? (new T[capacity]()) : data_;
 
-            if(exceeds && tmp && data_ && size_ > 0)
+            if (exceeds && tmp && data_ && size_ > 0)
                 std::copy(data_, data_ + size_, tmp);
 
-            if(tmp && data && size > 0)
+            if (tmp && data && size > 0)
                 std::copy(data, data + size, tmp + size_);
 
             if(exceeds) delete[] data_, data_ = tmp;
@@ -266,9 +266,10 @@ namespace stdex {
          * Clears and destroys object.
          */
         void clear() {
-            delete[] data_;
+            T* tmp = data_;
             data_ = nullptr;
             size_ = capacity_ = 0;
+            delete[] tmp;
         }
 
         /**
@@ -429,6 +430,11 @@ namespace stdex {
         size_t size_;
         size_t capacity_;
     };
+
+    /**
+     * Byte buffer type.
+     */
+    using byte_buffer = buffer<uint8_t>;
 
     /**
      * Swaps objects.
