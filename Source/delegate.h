@@ -311,6 +311,30 @@ namespace stdex {
             return delegate((void*)&object, lambda<L>);
         }
 
+        /**
+         * Returns a delegate that points to a member function.
+         * @tparam T Object type.
+         * @tparam M Member function.
+         * @param object Object pointer.
+         * @return Delegate that points to a member function.
+         */
+        template<typename T, R(T::*M)(P...)>
+        static delegate create(T* object) noexcept {
+            return delegate(object, method<T, M>);
+        }
+
+        /**
+         * Returns a delegate that points to a const member function.
+         * @tparam T Object type.
+         * @tparam M Const member function.
+         * @param object Object pointer.
+         * @return Delegate that points to a const member function.
+         */
+        template<typename T, R(T::*M)(P...) const>
+        static delegate create(const T* object) noexcept {
+            return delegate(const_cast<T*>(object), const_method<T, M>);
+        }
+
     private:
 
         /**
@@ -534,7 +558,7 @@ namespace stdex {
          */
         template <typename H>
         void operator()(P... args, H handler) const {
-            std::size_t index = 0;
+            size_t index = 0;
             for(const auto& invocation : invocations_) {
                 R item = (*invocation.function())(invocation.object(), args...);
                 handler(index++, &item);
@@ -553,7 +577,7 @@ namespace stdex {
          * Returns the queue size.
          * @return Queue size.
          */
-        std::size_t size() const noexcept {
+        size_t size() const noexcept {
             return invocations_.size();
         }
 

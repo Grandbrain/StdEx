@@ -58,8 +58,8 @@ TEST_CASE("Delegate testing") {
      */
     SECTION("Equality operators") {
         A object;
-        auto a = stdex::delegate<int()>::create<A, &A::data1>(object);
-        auto b = stdex::delegate<int()>::create<A, &A::data1>(object);
+        auto a = stdex::delegate<int()>::create<A, &A::data1>(&object);
+        auto b = stdex::delegate<int()>::create<A, &A::data1>(&object);
         REQUIRE(a == b);
     }
 
