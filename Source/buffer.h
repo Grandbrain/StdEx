@@ -17,7 +17,7 @@ namespace stdex {
         /**
          * Constructor without parameters.
          */
-        buffer()
+        buffer() noexcept
                 : data_(nullptr), size_(0), capacity_(0) {
         }
 
@@ -81,7 +81,7 @@ namespace stdex {
         /**
          * Destructor.
          */
-        ~buffer() {
+        ~buffer() noexcept {
             clear();
         }
 
@@ -168,11 +168,11 @@ namespace stdex {
          * @param capacity Capacity.
          */
         void assign(size_t capacity) {
-            if (capacity <= capacity_) return;
+            auto size = capacity > size_ ? size_ : capacity;
+            auto tmp = capacity > 0 ? new T[capacity]() : nullptr;
 
-            size_t size = capacity > size_ ? size_ : capacity;
-            T* tmp = capacity > 0 ? (new T[capacity]()) : nullptr;
-            if (tmp && data_ && size > 0) std::copy(data_, data_ + size, tmp);
+            if (data_ && tmp && size > 0)
+                std::copy(data_, data_ + size, tmp);
 
             delete[] data_;
             data_ = tmp;
@@ -198,8 +198,10 @@ namespace stdex {
         void assign(const T* data, size_t size, size_t capacity) {
             capacity = size > capacity ? size : capacity;
 
-            T* tmp = capacity > 0 ? (new T[capacity]()) : nullptr;
-            if (tmp && data && size > 0) std::copy(data, data + size, tmp);
+            auto tmp = capacity > 0 ? new T[capacity]() : nullptr;
+
+            if (tmp && data && size > 0)
+                std::copy(data, data + size, tmp);
 
             delete[] data_;
             data_ = tmp;
@@ -246,10 +248,9 @@ namespace stdex {
          * @param size Data size.
          */
         void append(const T* data, size_t size) {
-            size_t capacity = size + size_;
-            bool exceeds = capacity > capacity_;
-
-            T* tmp = exceeds ? (new T[capacity]()) : data_;
+            auto capacity = size + size_;
+            auto exceeds = capacity > capacity_;
+            auto tmp = exceeds ? new T[capacity]() : data_;
 
             if (exceeds && tmp && data_ && size_ > 0)
                 std::copy(data_, data_ + size_, tmp);
@@ -265,21 +266,11 @@ namespace stdex {
         /**
          * Clears and destroys object.
          */
-        void clear() {
+        void clear() noexcept {
             T* tmp = data_;
             data_ = nullptr;
             size_ = capacity_ = 0;
             delete[] tmp;
-        }
-
-        /**
-         * Swaps with another object.
-         * @param other Object to swap.
-         */
-        void swap(buffer& other) noexcept {
-            buffer tmp(std::move(other));
-            other = std::move(*this);
-            *this = std::move(tmp);
         }
 
         /**
@@ -291,6 +282,16 @@ namespace stdex {
             data_ = nullptr;
             size_ = capacity_ = 0;
             return data;
+        }
+
+        /**
+         * Swaps with another object.
+         * @param other Object to swap.
+         */
+        void swap(buffer& other) noexcept {
+            buffer tmp(std::move(other));
+            other = std::move(*this);
+            *this = std::move(tmp);
         }
 
         /**
@@ -426,8 +427,20 @@ namespace stdex {
         }
 
     private:
+
+        /**
+         * Buffer data.
+         */
         T* data_;
+
+        /**
+         * Buffer size.
+         */
         size_t size_;
+
+        /**
+         * Buffer capacity.
+         */
         size_t capacity_;
     };
 
@@ -435,6 +448,11 @@ namespace stdex {
      * Byte buffer type.
      */
     using byte_buffer = buffer<uint8_t>;
+
+    /**
+     * Char buffer type.
+     */
+    using char_buffer = buffer<char>;
 
     /**
      * Swaps objects.
