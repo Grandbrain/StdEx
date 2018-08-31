@@ -6,10 +6,10 @@ set(CMAKE_CXX_STANDARD 14)
 
 #[[ Set header files ]]
 set(HEADER_FILES
-        ../Source/buffer.h
-        ../Source/delegate.h
-        ../Source/pimpl.h
-        ../Source/range_access.h)
+        ../Source/buffer.hpp
+        ../Source/delegate.hpp
+        ../Source/pimpl.hpp
+        ../Source/range_access.hpp)
 
 #[[ Set test source files ]]
 set(TEST_SOURCE_FILES

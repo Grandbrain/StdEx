@@ -1,5 +1,5 @@
 #include <catch.hpp>
-#include <delegate.h>
+#include <delegate.hpp>
 
 /**
  * Simple function for testing purposes.

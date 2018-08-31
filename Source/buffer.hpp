@@ -2,7 +2,7 @@
 #define BUFFER_H
 
 #include <stdexcept>
-#include <range_access.h>
+#include <range_access.hpp>
 
 namespace stdex {
 

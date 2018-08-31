@@ -1,5 +1,5 @@
 #include <catch.hpp>
-#include <pimpl.h>
+#include <pimpl.hpp>
 
 TEST_CASE("Pimpl testing") {
 

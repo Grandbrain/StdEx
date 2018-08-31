@@ -1,6 +1,6 @@
 #include <catch.hpp>
-#include <buffer.h>
-#include <range_access.h>
+#include <buffer.hpp>
+#include <range_access.hpp>
 
 TEST_CASE("Range access testing") {
 

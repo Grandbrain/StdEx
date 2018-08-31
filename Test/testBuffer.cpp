@@ -1,5 +1,5 @@
 #include <catch.hpp>
-#include <buffer.h>
+#include <buffer.hpp>
 
 TEST_CASE("Buffer testing") {
 
