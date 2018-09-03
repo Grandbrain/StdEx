@@ -1,8 +1,7 @@
-#ifndef PIMPL_H
-#define PIMPL_H
+#ifndef PIMPL_HPP
+#define PIMPL_HPP
 
-#include <utility>
-#include <cstddef>
+#include <type_traits>
 
 namespace stdex {
 
@@ -11,7 +10,7 @@ namespace stdex {
      * @tparam U Storage type.
      * @tparam N Storage size.
      */
-    template <typename U, std::size_t N = 64>
+    template <typename U, size_t N = 64>
     class pimpl_ptr {
     public:
 
@@ -33,7 +32,7 @@ namespace stdex {
          * @tparam K Type of the storage to be copied.
          * @param other Object to copy.
          */
-        template <std::size_t M, typename K = U, typename =
+        template <size_t M, typename K = U, typename =
             typename std::enable_if<std::is_copy_constructible<K>{}>::type>
         pimpl_ptr(const pimpl_ptr<U, M>& other) {
             static_assert(sizeof(other) <= sizeof(store_), "Too big");
@@ -46,7 +45,7 @@ namespace stdex {
          * @tparam K Type of the storage to be moved.
          * @param other Object to move.
          */
-        template <std::size_t M, typename K = U, typename =
+        template <size_t M, typename K = U, typename =
             typename std::enable_if<std::is_move_constructible<K>{}>::type>
         pimpl_ptr(pimpl_ptr<U, M>&& other) {
             static_assert(sizeof(other) <= sizeof(store_), "Too big");
@@ -75,7 +74,7 @@ namespace stdex {
          * @param other Object to copy.
          * @return This object.
          */
-        template <std::size_t M, typename K = U, typename =
+        template <size_t M, typename K = U, typename =
             typename std::enable_if<std::is_copy_assignable<K>{}>::type>
         pimpl_ptr& operator=(const pimpl_ptr<U, M>& other) {
             static_assert(sizeof(other) <= sizeof(store_), "Too big");
@@ -90,7 +89,7 @@ namespace stdex {
          * @param other Object to move.
          * @return This object.
          */
-        template <std::size_t M, typename K = U, typename =
+        template <size_t M, typename K = U, typename =
             typename std::enable_if<std::is_move_assignable<K>{}>::type>
         pimpl_ptr& operator=(pimpl_ptr<U, M>&& other) {
             static_assert(sizeof(other) <= sizeof(store_), "Too big");

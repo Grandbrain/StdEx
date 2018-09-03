@@ -1,5 +1,5 @@
-#ifndef BUFFER_H
-#define BUFFER_H
+#ifndef BUFFER_HPP
+#define BUFFER_HPP
 
 #include <stdexcept>
 #include <range_access.hpp>

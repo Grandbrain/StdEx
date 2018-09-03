@@ -1,7 +1,5 @@
-#ifndef RANGE_ACCESS_H
-#define RANGE_ACCESS_H
-
-#include <cstddef>
+#ifndef RANGE_ACCESS_HPP
+#define RANGE_ACCESS_HPP
 
 namespace stdex {
 
