@@ -9,14 +9,16 @@ set(HEADER_FILES
         ../Source/buffer.hpp
         ../Source/delegate.hpp
         ../Source/pimpl.hpp
-        ../Source/range_access.hpp)
+        ../Source/range_access.hpp
+        ../Source/string_utils.hpp)
 
 #[[ Set test source files ]]
 set(TEST_SOURCE_FILES
         testBuffer.cpp
         testDelegate.cpp
         testPimpl.cpp
-        testRangeAccess.cpp)
+        testRangeAccess.cpp
+        testStringUtils.cpp)
 
 #[[ Set test entry point ]]
 set(TEST_ENTRY_POINT main.cpp)
