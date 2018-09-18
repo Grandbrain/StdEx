@@ -1,11 +1,10 @@
 #include <catch.hpp>
 #include <pimpl.hpp>
 
-TEST_CASE("Pimpl testing") {
+// Testing of pimpl smart pointer.
+TEST_CASE("Testing of pimpl smart pointer") {
 
-    /**
-     * Simple structure for testing purposes.
-     */
+    // Simple structure for testing purposes.
     struct A {
     public:
         A() {data1_ = data2_ = 0;}
@@ -18,10 +17,9 @@ TEST_CASE("Pimpl testing") {
         int data2_;
     };
 
-    /**
-     * Testing of constructors.
-     */
+    // Testing of constructors.
     SECTION("Constructors") {
+
         SECTION("Constructor with variable number of parameters") {
             stdex::pimpl_ptr<A> a;
             stdex::pimpl_ptr<A, 16> b(1, 2);
@@ -48,10 +46,9 @@ TEST_CASE("Pimpl testing") {
         }
     }
 
-    /**
-     * Testing assignment operators.
-     */
+    // Testing of assignment operators.
     SECTION("Assignment operators") {
+
         SECTION("Copy assignment operator") {
             stdex::pimpl_ptr<A> a(1, 2);
             stdex::pimpl_ptr<A> b;
@@ -69,9 +66,7 @@ TEST_CASE("Pimpl testing") {
         }
     }
 
-    /**
-     * Testing dereference operator.
-     */
+    // Testing of dereference operator.
     SECTION("Dereference operator") {
         stdex::pimpl_ptr<A> a(1, 2);
         A structure = *a;

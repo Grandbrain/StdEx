@@ -1,8 +1,13 @@
+/// \file pimpl.hpp
+/// \brief Classes and functions that implement Pimpl idiom.
+/// \bug No known bugs.
+
 #ifndef PIMPL_HPP
 #define PIMPL_HPP
 
 #include <type_traits>
 
+/// Contains classes and functions that extend the C++ STL.
 namespace stdex {
 
     /// Template class that implements Fast Pimpl idiom.
@@ -25,29 +30,29 @@ namespace stdex {
         /// Template copy constructor.
         /// \tparam M Size of the storage to be copied.
         /// \tparam K Type of the storage to be copied.
-        /// \param other Object to copy.
+        /// \param object Object to copy.
         template <size_t M, typename K = U, typename =
             typename std::enable_if<std::is_copy_constructible<K>{}>::type>
-        pimpl_ptr(const pimpl_ptr<U, M>& other) {
-            static_assert(sizeof(other) <= sizeof(store_), "Too big");
-            new (static_cast<void*>(&store_)) U(*other);
+        pimpl_ptr(const pimpl_ptr<U, M>& object) {
+            static_assert(sizeof(object) <= sizeof(store_), "Too big");
+            new (static_cast<void*>(&store_)) U(*object);
         }
 
         /// Template move constructor.
         /// \tparam M Size of the storage to be moved.
         /// \tparam K Type of the storage to be moved.
-        /// \param other Object to move.
+        /// \param object Object to move.
         template <size_t M, typename K = U, typename =
             typename std::enable_if<std::is_move_constructible<K>{}>::type>
-        pimpl_ptr(pimpl_ptr<U, M>&& other) {
-            static_assert(sizeof(other) <= sizeof(store_), "Too big");
-            new (static_cast<void*>(&store_)) U(std::move(*other));
+        pimpl_ptr(pimpl_ptr<U, M>&& object) {
+            static_assert(sizeof(object) <= sizeof(store_), "Too big");
+            new (static_cast<void*>(&store_)) U(std::move(*object));
         }
 
         /// Copy constructor.
-        /// \param other Object to move.
-        pimpl_ptr(const pimpl_ptr& other) {
-            new (static_cast<void*>(&store_)) U(*other);
+        /// \param object Object to move.
+        pimpl_ptr(const pimpl_ptr& object) {
+            new (static_cast<void*>(&store_)) U(*object);
         }
 
         /// Destructor.
@@ -58,34 +63,34 @@ namespace stdex {
         /// Template copy assignment operator.
         /// \tparam M Size of the storage to be copied.
         /// \tparam K Type of the storage to be copied.
-        /// \param other Object to copy.
+        /// \param object Object to copy.
         /// \return This object.
         template <size_t M, typename K = U, typename =
             typename std::enable_if<std::is_copy_assignable<K>{}>::type>
-        pimpl_ptr& operator=(const pimpl_ptr<U, M>& other) {
-            static_assert(sizeof(other) <= sizeof(store_), "Too big");
-            **this = *other;
+        pimpl_ptr& operator=(const pimpl_ptr<U, M>& object) {
+            static_assert(sizeof(object) <= sizeof(store_), "Too big");
+            **this = *object;
             return *this;
         }
 
         /// Template move assignment operator.
         /// \tparam M Size of the storage to be moved.
         /// \tparam K Type of the storage to be moved.
-        /// \param other Object to move.
+        /// \param object Object to move.
         /// \return This object.
         template <size_t M, typename K = U, typename =
             typename std::enable_if<std::is_move_assignable<K>{}>::type>
-        pimpl_ptr& operator=(pimpl_ptr<U, M>&& other) {
-            static_assert(sizeof(other) <= sizeof(store_), "Too big");
-            **this = std::move(*other);
+        pimpl_ptr& operator=(pimpl_ptr<U, M>&& object) {
+            static_assert(sizeof(object) <= sizeof(store_), "Too big");
+            **this = std::move(*object);
             return *this;
         }
 
         /// Copy assignment operator.
-        /// \param other Object to copy.
+        /// \param object Object to copy.
         /// \return This object.
-        pimpl_ptr& operator=(const pimpl_ptr& other) {
-            **this = *other;
+        pimpl_ptr& operator=(const pimpl_ptr& object) {
+            **this = *object;
             return *this;
         }
 

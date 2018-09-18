@@ -2,11 +2,10 @@
 #include <buffer.hpp>
 #include <range_access.hpp>
 
-TEST_CASE("Range access testing") {
+// Testing of range access.
+TEST_CASE("Testing of range access") {
 
-    /**
-     * Testing range access for containers.
-     */
+    // Testing of range access to containers.
     SECTION("Range access for containers") {
         stdex::buffer<int> a {1, 2, 3, 4, 5};
         stdex::buffer<int> b;
@@ -14,9 +13,7 @@ TEST_CASE("Range access testing") {
         REQUIRE(a == b);
     }
 
-    /**
-     * Testing range access for raw arrays.
-     */
+    // Testing of range access to raw arrays.
     SECTION("Range access for raw arrays") {
         int a[] {1, 2, 3, 4, 5};
         int b[] {0, 0, 0, 0, 0};

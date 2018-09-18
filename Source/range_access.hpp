@@ -1,6 +1,11 @@
+/// \file range_access.hpp
+/// \brief Classes and functions to support range access in containers.
+/// \bug No known bugs.
+
 #ifndef RANGE_ACCESS_HPP
 #define RANGE_ACCESS_HPP
 
+/// Contains classes and functions that extend the C++ STL.
 namespace stdex {
 
     /// Returns an iterator pointing to the first element of the container.

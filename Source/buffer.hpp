@@ -1,9 +1,14 @@
+/// \file buffer.hpp
+/// \brief Classes and functions that implement buffer structure.
+/// \bug No known bugs.
+
 #ifndef BUFFER_HPP
 #define BUFFER_HPP
 
 #include <stdexcept>
 #include <range_access.hpp>
 
+/// Contains classes and functions that extend the C++ STL.
 namespace stdex {
 
     /// Template class that provides dynamic storage for various data types.
@@ -18,17 +23,17 @@ namespace stdex {
         }
 
         /// Copy constructor.
-        /// \param other Object to copy.
-        buffer(const buffer& other)
+        /// \param object Object to copy.
+        buffer(const buffer& object)
                 : data_(nullptr), size_(0), capacity_(0) {
-            assign(other);
+            assign(object);
         }
 
         /// Move constructor.
-        /// \param other Object to move.
-        buffer(buffer&& other) noexcept
+        /// \param object Object to move.
+        buffer(buffer&& object) noexcept
                 : data_(nullptr), size_(0), capacity_(0) {
-            assign(std::move(other));
+            assign(std::move(object));
         }
 
         /// Constructor with initializer list.
@@ -82,18 +87,18 @@ namespace stdex {
         }
 
         /// Copy assignment operator.
-        /// \param other Object to copy.
+        /// \param object Object to copy.
         /// \return This object.
-        buffer& operator=(const buffer& other) {
-            assign(other);
+        buffer& operator=(const buffer& object) {
+            assign(object);
             return *this;
         }
 
         /// Move assignment operator.
-        /// \param other Object to move.
+        /// \param object Object to move.
         /// \return This object.
-        buffer& operator=(buffer&& other) noexcept {
-            assign(std::move(other));
+        buffer& operator=(buffer&& object) noexcept {
+            assign(std::move(object));
             return *this;
         }
 
@@ -106,20 +111,20 @@ namespace stdex {
         }
 
         /// Assigns an existing object.
-        /// \param other Object to copy.
-        void assign(const buffer& other) {
-            if (this != &other)
-                assign(other.data_, other.size_, other.capacity_);
+        /// \param object Object to copy.
+        void assign(const buffer& object) {
+            if (this != &object)
+                assign(object.data_, object.size_, object.capacity_);
         }
 
         /// Assigns a temporary object.
-        /// \param other Object to move.
-        void assign(buffer&& other) noexcept {
-            if (this != &other) {
-                std::swap(data_, other.data_);
-                std::swap(size_, other.size_);
-                std::swap(capacity_, other.capacity_);
-                other.clear();
+        /// \param object Object to move.
+        void assign(buffer&& object) noexcept {
+            if (this != &object) {
+                std::swap(data_, object.data_);
+                std::swap(size_, object.size_);
+                std::swap(capacity_, object.capacity_);
+                object.clear();
             }
         }
 
@@ -130,19 +135,10 @@ namespace stdex {
         }
 
         /// Assigns a capacity.
-        /// \param capacity
+        /// \param capacity Capacity.
         void assign(size_t capacity) {
-            auto size = capacity > size_ ? size_ : capacity;
-            auto tmp = capacity > 0 ? new T[capacity]() : nullptr;
-
-            if (data_ && tmp && size > 0)
-                std::copy(data_, data_ + size, tmp);
-
-            std::swap(data_, tmp);
-            size_ = tmp ? size : 0;
-            capacity_ = tmp ? capacity : 0;
-
-            delete[] tmp;
+            if (capacity != capacity_)
+                assign(data_, size_, capacity);
         }
 
         /// Assigns a data array.
@@ -157,7 +153,7 @@ namespace stdex {
         /// \param size Data size.
         /// \param capacity Capacity.
         void assign(const T* data, size_t size, size_t capacity) {
-            capacity = size > capacity ? size : capacity;
+            size = capacity > size ? size : capacity;
 
             auto tmp = capacity > 0 ? new T[capacity]() : nullptr;
 
@@ -165,23 +161,23 @@ namespace stdex {
                 std::copy(data, data + size, tmp);
 
             std::swap(data_, tmp);
-            size_ = tmp ? size : 0;
-            capacity_ = tmp ? capacity : 0;
+            size_ = data_ ? size : 0;
+            capacity_ = data_ ? capacity : 0;
 
             delete[] tmp;
         }
 
         /// Appends an existing object.
-        /// \param other Object to copy.
-        void append(const buffer& other) {
-            append(other.data_, other.size_);
+        /// \param object Object to copy.
+        void append(const buffer& object) {
+            append(object.data_, object.size_);
         }
 
         /// Appends a temporary object.
-        /// \param other Object to move.
-        void append(buffer&& other) {
-            append(other.data_, other.size_);
-            other.clear();
+        /// \param object Object to move.
+        void append(buffer&& object) {
+            append(object.data_, object.size_);
+            object.clear();
         }
 
         /// Appends an initializer list.
@@ -214,7 +210,13 @@ namespace stdex {
             size_ = size + size_;
             capacity_ = exceeds ? capacity : capacity_;
 
-            if(exceeds) delete[] tmp;
+            if (exceeds) delete[] tmp;
+        }
+
+        /// Reduces container's capacity to fit its size.
+        void shrink_to_fit() {
+            if (capacity_ != size_)
+                assign(data_, size_);
         }
 
         /// Clears and destroys object.
@@ -223,6 +225,21 @@ namespace stdex {
             data_ = nullptr;
             size_ = capacity_ = 0;
             delete[] tmp;
+        }
+
+        /// Acquires the data to manage.
+        /// \param data Data pointer.
+        /// \param size Data size.
+        /// \throw std::invalid_argument if any of the arguments is null.
+        /// \warning The function doesn't check if the data matches the size.
+        /// Memory will be cleared as if it was allocated by operator new.
+        void acquire(const T* data, size_t size) {
+            if (!data || size <= 0)
+                throw std::invalid_argument("data or size is invalid");
+
+            clear();
+            data_ = data;
+            size_ = capacity_ = size;
         }
 
         /// Releases data pointer.
@@ -235,19 +252,20 @@ namespace stdex {
         }
 
         /// Swaps with another object.
-        /// \param other Object to swap.
-        void swap(buffer& other) noexcept {
-            buffer tmp(std::move(other));
-            other = std::move(*this);
+        /// \param object Object to swap.
+        void swap(buffer& object) noexcept {
+            buffer tmp(std::move(object));
+            object = std::move(*this);
             *this = std::move(tmp);
         }
 
         /// Returns an element at the specified index.
         /// \param index Index.
         /// \return Element at the specified index.
+        /// \throw std::out_of_range if the index is out of range.
         T& at(const size_t index) {
             if (index >= size_)
-                throw std::out_of_range("index out of range");
+                throw std::out_of_range("index is out of range");
 
             return data_[index];
         }
@@ -255,9 +273,10 @@ namespace stdex {
         /// Returns an element at the specified index.
         /// \param index Index.
         /// \return Element at the specified index.
+        /// \throw std::out_of_range if the index is out of range.
         T at(const size_t index) const {
             if (index >= size_)
-                throw std::out_of_range("index out of range");
+                throw std::out_of_range("index is out of range");
 
             return data_[index];
         }
@@ -311,7 +330,8 @@ namespace stdex {
         }
 
         /// Indicates if data is empty.
-        /// \return True if data is empty and false otherwise.
+        /// \retval true if data is empty.
+        /// \retval false if data is not empty.
         bool empty() const noexcept {
             return size() == 0;
         }
@@ -375,7 +395,8 @@ namespace stdex {
     /// \tparam T Object type.
     /// \param a First object to compare.
     /// \param b Second object to compare.
-    /// \return True if objects are equal and false otherwise.
+    /// \retval true if objects are equal.
+    /// \retval false if objects are not equal.
     template <typename T>
     inline bool operator==(const buffer<T>& a, const buffer<T>& b) {
         return (a.size() == b.size()) &&
@@ -386,7 +407,8 @@ namespace stdex {
     /// \tparam T Object type.
     /// \param a First object to compare.
     /// \param b Second object to compare.
-    /// \return True if objects aren't equal and false otherwise.
+    /// \retval true if objects are not equal.
+    /// \retval false if objects are equal.
     template <typename T>
     inline bool operator!=(const buffer<T>& a, const buffer<T>& b) {
         return !(a == b);

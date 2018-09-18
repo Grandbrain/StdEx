@@ -1,18 +1,15 @@
 #include <catch.hpp>
 #include <delegate.hpp>
 
-/**
- * Simple function for testing purposes.
- */
+// Simple function for testing purposes.
 int data() {
     return 3;
 }
 
-TEST_CASE("Delegate testing") {
+// Testing of delegate.
+TEST_CASE("Testing of delegate") {
 
-    /**
-     * Simple class for testing purposes.
-     */
+    // Simple class for testing purposes.
     class A {
     public:
         A() {data1_ = data2_ = 0;}
@@ -26,9 +23,7 @@ TEST_CASE("Delegate testing") {
         int data2_;
     };
 
-    /**
-     * Testing delegates with member functions.
-     */
+    // Testing of delegates with member functions.
     SECTION("Delegates with member functions") {
         A object(1, 2);
         auto a = stdex::delegate<int()>::create<A, &A::data1>(object);
@@ -37,25 +32,19 @@ TEST_CASE("Delegate testing") {
         REQUIRE(b() == 2);
     }
 
-    /**
-     * Testing delegates with member functions.
-     */
+    // Testing of delegates with free functions.
     SECTION("Delegates with free functions") {
         auto c = stdex::delegate<int()>::create<&data>();
         REQUIRE(c() == 3);
     }
 
-    /**
-     * Testing delegates with lambda functions.
-     */
+    // Testing of delegates with lambda functions.
     SECTION("Delegates with lambda functions") {
         stdex::delegate<int()> c = []() -> int {return 4;};
         REQUIRE(c() == 4);
     }
 
-    /**
-     * Testing equality operators.
-     */
+    // Testing of equality operators.
     SECTION("Equality operators") {
         A object;
         auto a = stdex::delegate<int()>::create<A, &A::data1>(&object);
@@ -63,9 +52,7 @@ TEST_CASE("Delegate testing") {
         REQUIRE(a == b);
     }
 
-    /**
-     * Testing multicast delegates.
-     */
+    // Testing of multicast delegates.
     SECTION("Multicast delegates") {
         A object(1, 2);
         auto a = stdex::delegate<int()>::create<&data>();

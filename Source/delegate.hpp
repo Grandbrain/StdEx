@@ -1,9 +1,14 @@
+/// \file delegate.hpp
+/// \brief Classes and functions that implement delegate.
+/// \bug No known bugs.
+
 #ifndef DELEGATE_HPP
 #define DELEGATE_HPP
 
 #include <algorithm>
 #include <deque>
 
+/// Contains classes and functions that extend the C++ STL.
 namespace stdex {
 
     /// Non-specialized template class that implements delegate base.
@@ -58,17 +63,18 @@ namespace stdex {
             }
 
             /// Equality operator.
-            /// \param other Object to compare.
+            /// \param object Object to compare.
             /// \return True if objects are equal and false otherwise.
-            bool operator==(const invocation& other) const noexcept {
-                return object_ == other.object_ && function_ == other.function_;
+            bool operator==(const invocation& object) const noexcept {
+                return object_ == object.object_ &&
+                       function_ == object.function_;
             }
 
             /// Equality operator.
-            /// \param other Object to compare.
+            /// \param object Object to compare.
             /// \return True if objects aren't equal and false otherwise.
-            bool operator!=(const invocation& other) const noexcept {
-                return !(*this == other);
+            bool operator!=(const invocation& object) const noexcept {
+                return !(*this == object);
             }
 
             /// Indicates if function pointer is null.
@@ -159,31 +165,31 @@ namespace stdex {
         }
 
         /// Equality operator.
-        /// \param other Object to compare.
+        /// \param object Object to compare.
         /// \return True if objects are equal and false otherwise.
-        bool operator==(const delegate& other) const noexcept {
-            return invocation_ == other.invocation_;
+        bool operator==(const delegate& object) const noexcept {
+            return invocation_ == object.invocation_;
         }
 
         /// Equality operator.
-        /// \param other Object to compare.
+        /// \param object Object to compare.
         /// \return True if objects aren't equal and false otherwise.
-        bool operator!=(const delegate& other) const noexcept {
-            return !(*this == other);
+        bool operator!=(const delegate& object) const noexcept {
+            return !(*this == object);
         }
 
         /// Equality operator.
-        /// \param other Object to compare.
+        /// \param object Object to compare.
         /// \return True if objects are equal and false otherwise.
-        bool operator==(const multidelegate<R(P...)>& other) const noexcept {
-            return other == *this;
+        bool operator==(const multidelegate<R(P...)>& object) const noexcept {
+            return object == *this;
         }
 
         /// Equality operator.
-        /// \param other Object to compare.
+        /// \param object Object to compare.
         /// \return True if objects aren't equal and false otherwise.
-        bool operator!=(const multidelegate<R(P...)>& other) const noexcept {
-            return other != *this;
+        bool operator!=(const multidelegate<R(P...)>& object) const noexcept {
+            return object != *this;
         }
 
         /// Function call operator.
@@ -346,57 +352,57 @@ namespace stdex {
         }
 
         /// Equality operator.
-        /// \param other Object to compare.
+        /// \param object Object to compare.
         /// \return True if objects are equal and false otherwise.
-        bool operator==(const multidelegate& other) const noexcept {
-            return invocations_ == other.invocations_;
+        bool operator==(const multidelegate& object) const noexcept {
+            return invocations_ == object.invocations_;
         }
 
         /// Equality operator.
-        /// \param other Object to compare.
+        /// \param object Object to compare.
         /// \return True if objects aren't equal and false otherwise.
-        bool operator!=(const multidelegate& other) const noexcept {
-            return !(*this == other);
+        bool operator!=(const multidelegate& object) const noexcept {
+            return !(*this == object);
         }
 
         /// Equality operator.
-        /// \param other Object to compare.
+        /// \param object Object to compare.
         /// \return True if objects are equal and false otherwise.
-        bool operator==(const delegate<R(P...)>& other) const noexcept {
-            if (!(*this) && !other) return true;
-            if (size() != 1 || !other) return false;
-            return other.invocation_ == invocations_.front();
+        bool operator==(const delegate<R(P...)>& object) const noexcept {
+            if (!(*this) && !object) return true;
+            if (size() != 1 || !object) return false;
+            return object.invocation_ == invocations_.front();
         }
 
         /// Equality operator.
-        /// \param other Object to compare.
+        /// \param object Object to compare.
         /// \return True if objects aren't equal and false otherwise.
-        bool operator!=(const delegate<R(P...)>& other) const noexcept {
-            return !(*this == other);
+        bool operator!=(const delegate<R(P...)>& object) const noexcept {
+            return !(*this == object);
         }
 
         /// Adds delegate to the queue.
-        /// \param other Multicast delegate to add.
+        /// \param object Multicast delegate to add.
         /// \return This object.
-        multidelegate& operator+=(const multidelegate& other) {
-            for(const auto& invocation : other.invocations_)
+        multidelegate& operator+=(const multidelegate& object) {
+            for(const auto& invocation : object.invocations_)
                 invocations_.push_back(invocation);
             return *this;
         }
 
         /// Adds delegate to the queue.
-        /// \param other Delegate to add.
+        /// \param object Delegate to add.
         /// \return This object.
-        multidelegate& operator+=(const delegate<R(P...)>& other) {
-            if(other) invocations_.push_back(other.invocation_);
+        multidelegate& operator+=(const delegate<R(P...)>& object) {
+            if(object) invocations_.push_back(object.invocation_);
             return *this;
         }
 
         /// Removes delegate from the queue.
-        /// \param other Multicast delegate to remove.
+        /// \param object Multicast delegate to remove.
         /// \return This object.
-        multidelegate& operator-=(const multidelegate& other) {
-            for (const auto& invocation : other.invocations_) {
+        multidelegate& operator-=(const multidelegate& object) {
+            for (const auto& invocation : object.invocations_) {
                 auto iterator = std::find(invocations_.begin(),
                                           invocations_.end(), invocation);
 
@@ -407,11 +413,11 @@ namespace stdex {
         }
 
         /// Removes delegate from the queue.
-        /// \param other Delegate to remove.
+        /// \param object Delegate to remove.
         /// \return This object.
-        multidelegate& operator-=(const delegate<R(P...)>& other) {
+        multidelegate& operator-=(const delegate<R(P...)>& object) {
             auto iterator = std::find(invocations_.begin(),
-                                      invocations_.end(), other.invocation_);
+                                      invocations_.end(), object.invocation_);
 
             if (iterator != invocations_.end())
                 invocations_.erase(iterator);

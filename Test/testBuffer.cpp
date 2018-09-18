@@ -1,12 +1,12 @@
 #include <catch.hpp>
 #include <buffer.hpp>
 
-TEST_CASE("Buffer testing") {
+// Testing of buffer.
+TEST_CASE("Testing of buffer") {
 
-    /**
-     * Testing buffer construction.
-     */
+    // Testing of buffer constructors.
     SECTION("Constructors") {
+
         SECTION("Constructor without parameters") {
             stdex::buffer<int> a;
             REQUIRE(a.data() == nullptr);
@@ -69,10 +69,9 @@ TEST_CASE("Buffer testing") {
         }
     }
 
-    /**
-     * Testing assignment operators.
-     */
+    // Testing of assignment operators.
     SECTION("Assignment operators") {
+
         SECTION("Copy assignment operator") {
             stdex::buffer<int> a {1, 2, 3, 4, 5};
             stdex::buffer<int> b {6, 7, 8, 9, 10};
@@ -106,10 +105,9 @@ TEST_CASE("Buffer testing") {
         }
     }
 
-    /**
-     * Testing equality operators.
-     */
+    // Testing of equality operators.
     SECTION("Equality checking") {
+
         SECTION("Equality operator") {
             stdex::buffer<int> a {1, 2, 3, 4, 5};
             stdex::buffer<int> b {1, 2, 3, 4, 5};
@@ -123,10 +121,9 @@ TEST_CASE("Buffer testing") {
         }
     }
 
-    /**
-     * Testing data assignment.
-     */
+    // Testing of data assignment.
     SECTION("Data assignment") {
+
         SECTION("Assign an initializer list") {
             stdex::buffer<int> a;
             a.assign({1, 2, 3, 4, 5});
@@ -199,10 +196,9 @@ TEST_CASE("Buffer testing") {
         }
     }
 
-    /**
-     * Testing data appending.
-     */
+    // Testing of data appending.
     SECTION("Data appending") {
+
         SECTION("Append an existing object") {
             stdex::buffer<int> a {1, 2, 3, 4, 5};
             stdex::buffer<int> b {6, 7, 8, 9, 10};
@@ -268,10 +264,9 @@ TEST_CASE("Buffer testing") {
         }
     }
 
-    /**
-     * Testing range access.
-     */
+    // Testing of range access.
     SECTION("Range access") {
+
         SECTION("Getting the first element") {
             stdex::buffer<int> a {1, 2, 3, 4, 5};
             REQUIRE(a.first() == 1);
@@ -292,9 +287,7 @@ TEST_CASE("Buffer testing") {
         }
     }
 
-    /**
-     * Testing data clearing.
-     */
+    // Testing of data clearing.
     SECTION("Data clearing") {
         stdex::buffer<int> a {1, 2, 3, 4, 5};
         a.clear();
@@ -303,9 +296,7 @@ TEST_CASE("Buffer testing") {
         REQUIRE(a.capacity() == 0);
     }
 
-    /**
-     * Testing object swapping.
-     */
+    // Testing of object swapping.
     SECTION("Object swapping") {
         stdex::buffer<int> a {1, 2, 3, 4, 5};
         stdex::buffer<int> b {6, 7, 8, 9, 10};
@@ -320,9 +311,19 @@ TEST_CASE("Buffer testing") {
         REQUIRE(b.capacity() == 5);
     }
 
-    /**
-     * Testing data releasing.
-     */
+    // Testing of shrinking to fit.
+    SECTION("Shrinking to fit") {
+        stdex::buffer<int> a {1, 2, 3, 4, 5};
+        a.assign(10);
+        REQUIRE(a.data() != nullptr);
+        REQUIRE(a.size() == 5);
+        REQUIRE(a.capacity() == 10);
+        REQUIRE(a.at(4) == 5);
+        a.shrink_to_fit();
+        REQUIRE(a.capacity() == 5);
+    }
+
+    // Testing of data releasing.
     SECTION("Data releasing") {
         stdex::buffer<int> a {1, 2, 3, 4, 5};
         int* data = a.release();
