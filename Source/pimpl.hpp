@@ -5,7 +5,8 @@
 #ifndef PIMPL_HPP
 #define PIMPL_HPP
 
-#include <type_traits>
+#include <cstddef>
+#include <utility>
 
 /// Contains classes and functions that extend the C++ STL.
 namespace stdex {
