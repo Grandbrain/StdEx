@@ -124,7 +124,7 @@ namespace stdex {
 
         /// Constructor without arguments.
         delegate() noexcept
-                : invocation_() {
+            : invocation_() {
         }
 
         /// Constructor with the lambda object.
@@ -132,7 +132,7 @@ namespace stdex {
         /// \param object Object.
         template<typename L>
         delegate(const L& object) noexcept
-                : invocation_((void*)&object, lambda<L>) {
+            : invocation_((void*)&object, lambda<L>) {
         }
 
         /// Assignment operator with the lambda object.
@@ -142,7 +142,7 @@ namespace stdex {
         template<typename L>
         delegate& operator=(const L& object) noexcept {
             invocation_ = typename delegate_base<R(P...)>::invocation(
-                    (void*)&object, lambda<L>);
+                (void*)&object, lambda<L>);
             return *this;
         }
 

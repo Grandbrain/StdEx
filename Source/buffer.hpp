@@ -233,7 +233,7 @@ namespace stdex {
         /// \throw std::invalid_argument if any of the arguments is null.
         /// \warning The function doesn't check if the data matches the size.
         /// Memory will be cleared as if it was allocated by operator new.
-        void acquire(const T* data, size_t size) {
+        void acquire(T* data, size_t size) {
             if (!data || size <= 0)
                 throw std::invalid_argument("data or size is invalid");
 
