@@ -227,19 +227,31 @@ namespace stdex {
             delete[] tmp;
         }
 
-        /// Acquires the data to manage.
+        /// Acquires data array to manage.
         /// \param data Data pointer.
         /// \param size Data size.
-        /// \throw std::invalid_argument if any of the arguments is null.
         /// \warning The function doesn't check if the data matches the size.
         /// Memory will be cleared as if it was allocated by operator new.
         void acquire(T* data, size_t size) {
-            if (!data || size <= 0)
-                throw std::invalid_argument("data or size is invalid");
+            acquire(data, size, size);
+        }
+
+        /// Acquires data array to manage.
+        /// \param data Data pointer.
+        /// \param size Data size.
+        /// \param capacity Capacity.
+        /// \throw std::invalid_argument if any of the arguments is null.
+        /// \warning The function doesn't check if the data matches the size.
+        /// Memory will be cleared as if it was allocated by operator new.
+        void acquire(T* data, size_t size, size_t capacity) {
+            if (!data || size <= 0 || size > capacity)
+                throw std::invalid_argument("arguments are invalid");
 
             clear();
+
             data_ = data;
-            size_ = capacity_ = size;
+            size_ = size;
+            capacity_ = capacity;
         }
 
         /// Releases data pointer.
