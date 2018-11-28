@@ -73,4 +73,18 @@ TEST_CASE("Testing of pimpl smart pointer") {
         REQUIRE(structure.data1() == 1);
         REQUIRE(structure.data2() == 2);
     }
+
+    // Testing of various operations.
+    SECTION("Various operations") {
+
+        SECTION("Swap operation") {
+            stdex::pimpl_ptr<A> a(1, 2);
+            stdex::pimpl_ptr<A> b(3);
+            std::swap(a, b);
+            REQUIRE(b->data1() == 1);
+            REQUIRE(b->data2() == 2);
+            REQUIRE(a->data1() == 3);
+            REQUIRE(a->data2() == 3);
+        }
+    }
 }
