@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.6)
 
 #[[ Set C++ standard version ]]
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 
 #[[ Set header files ]]
 set(HEADER_FILES
