@@ -2,8 +2,7 @@
 .idea_modules/
 out/
 [Bb]uild/
-cmake-build-debug/
-cmake-build-release/
+cmake-build-*/
 *.iws
 atlassian-ide-plugin.xml
 com_crashlytics_export_strings.xml
