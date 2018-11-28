@@ -388,11 +388,13 @@ namespace stdex {
         size_t capacity_;
     };
 
-    /// Byte buffer type.
-    using byte_buffer = buffer<uint8_t>;
-
     /// Char buffer type.
     using char_buffer = buffer<char>;
+
+#if __cplusplus >= 201703L
+    /// Byte buffer type.
+    using byte_buffer = buffer<std::byte>;
+#endif
 
     /// Swaps objects.
     /// \tparam T Object type.
