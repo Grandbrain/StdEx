@@ -5,6 +5,7 @@
 #ifndef BUFFER_HPP
 #define BUFFER_HPP
 
+#include <cstddef>
 #include <stdexcept>
 #include <range_access.hpp>
 
