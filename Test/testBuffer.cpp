@@ -252,6 +252,20 @@ TEST_CASE("Testing of buffer") {
             REQUIRE(a.at(9) == 10);
         }
 
+        SECTION("Append a data array at specific position") {
+            int array[] = {6, 7};
+            stdex::buffer<int> a {1, 2, 3, 4, 5};
+            a.append(array, sizeof(array) / sizeof(int), 1);
+            REQUIRE(a.data() != nullptr);
+            REQUIRE(a.size() == 5);
+            REQUIRE(a.capacity() == 5);
+            REQUIRE(a.at(0) == 1);
+            REQUIRE(a.at(1) == 6);
+            REQUIRE(a.at(2) == 7);
+            REQUIRE(a.at(3) == 4);
+            REQUIRE(a.at(4) == 5);
+        }
+
         SECTION("Append a data with reserved capacity") {
             stdex::buffer<int> a {1, 2, 3, 4, 5};
             a.assign(10);

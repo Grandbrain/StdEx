@@ -197,18 +197,26 @@ namespace stdex {
         /// \param data Data pointer.
         /// \param size Data size.
         void append(const T* data, size_t size) {
-            auto capacity = size + size_;
+            append(data, size, size_);
+        }
+
+        /// Appends a data array.
+        /// \param data Data pointer.
+        /// \param size Data size.
+        /// \param position Starting position.
+        void append(const T* data, size_t size, size_t position) {
+            auto capacity = size + position;
             auto exceeds = capacity > capacity_;
             auto tmp = exceeds ? new T[capacity]() : data_;
 
-            if (exceeds && tmp && data_ && size_ > 0)
-                std::copy(data_, data_ + size_, tmp);
+            if (exceeds && tmp && data_ && position > 0)
+                std::copy(data_, data_ + position, tmp);
 
             if (tmp && data && size > 0)
-                std::copy(data, data + size, tmp + size_);
+                std::copy(data, data + size, tmp + position);
 
             std::swap(data_, tmp);
-            size_ = size + size_;
+            size_ = capacity > size_ ? capacity : size_;
             capacity_ = exceeds ? capacity : capacity_;
 
             if (exceeds) delete[] tmp;
