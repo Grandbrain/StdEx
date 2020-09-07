@@ -6,7 +6,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 # Set project information.
-project(StdEx VERSION 2.0.0 LANGUAGES CXX)
+project(StdEx VERSION 2.2.0 LANGUAGES CXX)
 
 # Set C++ standard version.
 set(CMAKE_CXX_STANDARD 11)
