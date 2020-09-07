@@ -15,7 +15,7 @@ TEST_CASE("Testing of buffer") {
         }
 
         SECTION("Constructor with initializer list") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
             REQUIRE(a.data() != nullptr);
             REQUIRE(a.size() == 5);
             REQUIRE(a.capacity() == 5);
@@ -30,7 +30,7 @@ TEST_CASE("Testing of buffer") {
         }
 
         SECTION("Constructor with data array") {
-            int array[] = {1, 2, 3, 4, 5};
+            int array[] = { 1, 2, 3, 4, 5 };
             stdex::buffer<int> a(array, sizeof(array) / sizeof(int));
             REQUIRE(a.data() != nullptr);
             REQUIRE(a.size() == 5);
@@ -39,7 +39,7 @@ TEST_CASE("Testing of buffer") {
         }
 
         SECTION("Constructor with data array and capacity") {
-            int array[] = {1, 2, 3, 4, 5};
+            int array[] = { 1, 2, 3, 4, 5 };
             stdex::buffer<int> a(array, sizeof(array) / sizeof(int), 10);
             REQUIRE(a.data() != nullptr);
             REQUIRE(a.size() == 5);
@@ -48,7 +48,7 @@ TEST_CASE("Testing of buffer") {
         }
 
         SECTION("Copy constructor") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
             stdex::buffer<int> b = a;
             REQUIRE(b.data() != nullptr);
             REQUIRE(b.size() == 5);
@@ -57,15 +57,16 @@ TEST_CASE("Testing of buffer") {
         }
 
         SECTION("Move constructor") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
             stdex::buffer<int> b = std::move(a);
             REQUIRE(b.data() != nullptr);
             REQUIRE(b.size() == 5);
             REQUIRE(b.capacity() == 5);
+            REQUIRE(b.at(0) == 1);
+            REQUIRE(b.at(1) == 2);
             REQUIRE(b.at(2) == 3);
-            REQUIRE(a.data() == nullptr);
-            REQUIRE(a.empty());
-            REQUIRE(a.capacity() == 0);
+            REQUIRE(b.at(3) == 4);
+            REQUIRE(b.at(4) == 5);
         }
     }
 
@@ -73,8 +74,8 @@ TEST_CASE("Testing of buffer") {
     SECTION("Assignment operators") {
 
         SECTION("Copy assignment operator") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
-            stdex::buffer<int> b {6, 7, 8, 9, 10};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
+            stdex::buffer<int> b { 6, 7, 8, 9, 10 };
             b = a;
             REQUIRE(b.size() == 5);
             REQUIRE(b.capacity() == 5);
@@ -83,21 +84,21 @@ TEST_CASE("Testing of buffer") {
         }
 
         SECTION("Move assignment operator") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
-            stdex::buffer<int> b {6, 7, 8, 9, 10};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
+            stdex::buffer<int> b { 6, 7, 8, 9, 10 };
             b = std::move(a);
             REQUIRE(b.size() == 5);
             REQUIRE(b.capacity() == 5);
             REQUIRE(b.at(0) == 1);
+            REQUIRE(b.at(1) == 2);
+            REQUIRE(b.at(2) == 3);
+            REQUIRE(b.at(3) == 4);
             REQUIRE(b.at(4) == 5);
-            REQUIRE(a.data() == nullptr);
-            REQUIRE(a.empty());
-            REQUIRE(a.capacity() == 0);
         }
 
         SECTION("Assignment operator with initializer list") {
             stdex::buffer<int> a;
-            a = {1, 2, 3, 4, 5};
+            a = { 1, 2, 3, 4, 5 };
             REQUIRE(a.size() == 5);
             REQUIRE(a.capacity() == 5);
             REQUIRE(a.at(0) == 1);
@@ -109,14 +110,14 @@ TEST_CASE("Testing of buffer") {
     SECTION("Equality checking") {
 
         SECTION("Equality operator") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
-            stdex::buffer<int> b {1, 2, 3, 4, 5};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
+            stdex::buffer<int> b { 1, 2, 3, 4, 5 };
             REQUIRE(a == b);
         }
 
         SECTION("Inequality operator") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
-            stdex::buffer<int> b {6, 7, 8, 9, 10};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
+            stdex::buffer<int> b { 6, 7, 8, 9, 10 };
             REQUIRE(a != b);
         }
     }
@@ -126,7 +127,7 @@ TEST_CASE("Testing of buffer") {
 
         SECTION("Assign an initializer list") {
             stdex::buffer<int> a;
-            a.assign({1, 2, 3, 4, 5});
+            a.assign({ 1, 2, 3, 4, 5 });
             REQUIRE(a.data() != nullptr);
             REQUIRE(a.size() == 5);
             REQUIRE(a.capacity() == 5);
@@ -142,7 +143,7 @@ TEST_CASE("Testing of buffer") {
         }
 
         SECTION("Assign a data array") {
-            int array[] = {1, 2, 3, 4, 5};
+            int array[] = { 1, 2, 3, 4, 5 };
             stdex::buffer<int> a;
             a.assign(array, sizeof(array) / sizeof(int));
             REQUIRE(a.data() != nullptr);
@@ -152,7 +153,7 @@ TEST_CASE("Testing of buffer") {
         }
 
         SECTION("Assign a data array and capacity") {
-            int array[] = {1, 2, 3, 4, 5};
+            int array[] = { 1, 2, 3, 4, 5 };
             stdex::buffer<int> a;
             a.assign(array, sizeof(array) / sizeof(int), 10);
             REQUIRE(a.data() != nullptr);
@@ -162,7 +163,7 @@ TEST_CASE("Testing of buffer") {
         }
 
         SECTION("Assign an existing object") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
             stdex::buffer<int> b;
             b.assign(a);
             REQUIRE(b.data() != nullptr);
@@ -172,21 +173,22 @@ TEST_CASE("Testing of buffer") {
         }
 
         SECTION("Assign a temporary object") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
             stdex::buffer<int> b;
             b.assign(std::move(a));
             REQUIRE(b.data() != nullptr);
             REQUIRE(b.size() == 5);
             REQUIRE(b.capacity() == 5);
+            REQUIRE(b.at(0) == 1);
+            REQUIRE(b.at(1) == 2);
             REQUIRE(b.at(2) == 3);
-            REQUIRE(a.data() == nullptr);
-            REQUIRE(a.empty());
-            REQUIRE(a.capacity() == 0);
+            REQUIRE(b.at(3) == 4);
+            REQUIRE(b.at(4) == 5);
         }
 
         SECTION("Erase old data") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
-            stdex::buffer<int> b {6, 7, 8, 9, 10};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
+            stdex::buffer<int> b { 6, 7, 8, 9, 10 };
             b.assign(a);
             REQUIRE(b.data() != nullptr);
             REQUIRE(b.size() == 5);
@@ -200,8 +202,8 @@ TEST_CASE("Testing of buffer") {
     SECTION("Data appending") {
 
         SECTION("Append an existing object") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
-            stdex::buffer<int> b {6, 7, 8, 9, 10};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
+            stdex::buffer<int> b { 6, 7, 8, 9, 10 };
             a.append(b);
             REQUIRE(a.data() != nullptr);
             REQUIRE(a.size() == 10);
@@ -210,23 +212,9 @@ TEST_CASE("Testing of buffer") {
             REQUIRE(a[9] == 10);
         }
 
-        SECTION("Append a temporary object") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
-            stdex::buffer<int> b {6, 7, 8, 9, 10};
-            a.append(std::move(b));
-            REQUIRE(a.data() != nullptr);
-            REQUIRE(a.size() == 10);
-            REQUIRE(a.capacity() == 10);
-            REQUIRE(a.at(0) == 1);
-            REQUIRE(a[9] == 10);
-            REQUIRE(b.data() == nullptr);
-            REQUIRE(b.empty());
-            REQUIRE(b.capacity() == 0);
-        }
-
         SECTION("Append an initializer list") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
-            a.append({6, 7, 8, 9, 10});
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
+            a.append({ 6, 7, 8, 9, 10 });
             REQUIRE(a.data() != nullptr);
             REQUIRE(a.size() == 10);
             REQUIRE(a.capacity() == 10);
@@ -234,7 +222,7 @@ TEST_CASE("Testing of buffer") {
         }
 
         SECTION("Append a single value") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
             a.append(6);
             REQUIRE(a.data() != nullptr);
             REQUIRE(a.size() == 6);
@@ -243,8 +231,8 @@ TEST_CASE("Testing of buffer") {
         }
 
         SECTION("Append a data array") {
-            int array[] = {6, 7, 8, 9, 10};
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
+            int array[] = { 6, 7, 8, 9, 10 };
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
             a.append(array, sizeof(array) / sizeof(int));
             REQUIRE(a.data() != nullptr);
             REQUIRE(a.size() == 10);
@@ -252,24 +240,10 @@ TEST_CASE("Testing of buffer") {
             REQUIRE(a.at(9) == 10);
         }
 
-        SECTION("Append a data array at specific position") {
-            int array[] = {6, 7};
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
-            a.append(array, sizeof(array) / sizeof(int), 1);
-            REQUIRE(a.data() != nullptr);
-            REQUIRE(a.size() == 5);
-            REQUIRE(a.capacity() == 5);
-            REQUIRE(a.at(0) == 1);
-            REQUIRE(a.at(1) == 6);
-            REQUIRE(a.at(2) == 7);
-            REQUIRE(a.at(3) == 4);
-            REQUIRE(a.at(4) == 5);
-        }
-
         SECTION("Append a data with reserved capacity") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
             a.assign(10);
-            a.append({6, 7, 8});
+            a.append({ 6, 7, 8 });
             REQUIRE(a.data() != nullptr);
             REQUIRE(a.size() == 8);
             REQUIRE(a.capacity() == 10);
@@ -278,23 +252,41 @@ TEST_CASE("Testing of buffer") {
         }
     }
 
+    // Testing of data insertion.
+    SECTION("Data insertion") {
+
+        SECTION("Insert a data array") {
+            int array[] = { 6, 7, 8, 9, 10 };
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
+            a.insert(array, sizeof(array) / sizeof(int), 2);
+            REQUIRE(a.data() != nullptr);
+            REQUIRE(a.size() == 10);
+            REQUIRE(a.capacity() == 10);
+            REQUIRE(a.at(0) == 1);
+            REQUIRE(a.at(2) == 6);
+            REQUIRE(a.at(4) == 8);
+            REQUIRE(a.at(6) == 10);
+            REQUIRE(a.at(9) == 5);
+        }
+    }
+
     // Testing of range access.
     SECTION("Range access") {
 
         SECTION("Getting the first element") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
             REQUIRE(a.first() == 1);
             REQUIRE((a.first() = 10) == 10);
         }
 
         SECTION("Getting the last element") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
             REQUIRE(a.last() == 5);
             REQUIRE((a.last() = 10) == 10);
         }
 
         SECTION("Iterator loop") {
-            stdex::buffer<int> a {1, 2, 3, 4, 5};
+            stdex::buffer<int> a { 1, 2, 3, 4, 5 };
             stdex::buffer<int> b;
             for (int element : a) b.append(element);
             REQUIRE(a == b);
@@ -303,7 +295,7 @@ TEST_CASE("Testing of buffer") {
 
     // Testing of data clearing.
     SECTION("Data clearing") {
-        stdex::buffer<int> a {1, 2, 3, 4, 5};
+        stdex::buffer<int> a { 1, 2, 3, 4, 5 };
         a.clear();
         REQUIRE(a.data() == nullptr);
         REQUIRE(a.empty());
@@ -312,8 +304,8 @@ TEST_CASE("Testing of buffer") {
 
     // Testing of object swapping.
     SECTION("Object swapping") {
-        stdex::buffer<int> a {1, 2, 3, 4, 5};
-        stdex::buffer<int> b {6, 7, 8, 9, 10};
+        stdex::buffer<int> a { 1, 2, 3, 4, 5 };
+        stdex::buffer<int32_t> b { 6, 7, 8, 9, 10 };
         stdex::swap(a, b);
         REQUIRE(a.at(0) == 6);
         REQUIRE(a.at(4) == 10);
@@ -327,7 +319,7 @@ TEST_CASE("Testing of buffer") {
 
     // Testing of shrinking to fit.
     SECTION("Shrinking to fit") {
-        stdex::buffer<int> a {1, 2, 3, 4, 5};
+        stdex::buffer<int> a { 1, 2, 3, 4, 5 };
         a.assign(10);
         REQUIRE(a.data() != nullptr);
         REQUIRE(a.size() == 5);
@@ -339,7 +331,7 @@ TEST_CASE("Testing of buffer") {
 
     // Testing of data releasing.
     SECTION("Data releasing") {
-        stdex::buffer<int> a {1, 2, 3, 4, 5};
+        stdex::buffer<int> a { 1, 2, 3, 4, 5 };
         int* data = a.release();
         delete[] data;
         REQUIRE(a.data() == nullptr);

@@ -1,21 +1,21 @@
 #include <catch.hpp>
 #include <pimpl.hpp>
 
+// Simple structure for testing purposes.
+struct A {
+public:
+    explicit A() { data1_ = data2_ = 0; }
+    explicit A(int data) { data1_ = data2_ = data; }
+    explicit A(int data1, int data2) { data1_ = data1, data2_ = data2; }
+    int data1() const { return data1_; }
+    int data2() const { return data2_; }
+private:
+    int data1_;
+    int data2_;
+};
+
 // Testing of pimpl smart pointer.
 TEST_CASE("Testing of pimpl smart pointer") {
-
-    // Simple structure for testing purposes.
-    struct A {
-    public:
-        A() {data1_ = data2_ = 0;}
-        A(int data) {data1_ = data2_ = data;}
-        A(int data1, int data2) {data1_ = data1, data2_ = data2;}
-        int data1() {return data1_;}
-        int data2() {return data2_;}
-    private:
-        int data1_;
-        int data2_;
-    };
 
     // Testing of constructors.
     SECTION("Constructors") {

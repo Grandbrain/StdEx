@@ -5,9 +5,9 @@
 #ifndef BUFFER_HPP
 #define BUFFER_HPP
 
-#include <cstddef>
+#include <initializer_list>
 #include <stdexcept>
-#include <range_access.hpp>
+#include <memory>
 
 /// Contains classes and functions that extend the C++ STL.
 namespace stdex {
@@ -20,42 +20,35 @@ namespace stdex {
 
         /// Constructor without parameters.
         buffer() noexcept
-                : data_(nullptr), size_(0), capacity_(0) {
+            : data_(nullptr), size_(0), capacity_(0) {
         }
 
         /// Copy constructor.
         /// \param object Object to copy.
         buffer(const buffer& object)
-                : data_(nullptr), size_(0), capacity_(0) {
+            : data_(nullptr), size_(0), capacity_(0) {
             assign(object);
         }
 
         /// Move constructor.
         /// \param object Object to move.
         buffer(buffer&& object) noexcept
-                : data_(nullptr), size_(0), capacity_(0) {
+            : data_(nullptr), size_(0), capacity_(0) {
             assign(std::move(object));
         }
 
         /// Constructor with initializer list.
         /// \param list Initializer list.
         buffer(const std::initializer_list<T>& list)
-                : data_(nullptr), size_(0), capacity_(0) {
+            : data_(nullptr), size_(0), capacity_(0) {
             assign(list);
-        }
-
-        /// Constructor with capacity.
-        /// \param capacity Capacity.
-        buffer(size_t capacity)
-                : data_(nullptr), size_(0), capacity_(0) {
-            assign(capacity);
         }
 
         /// Constructor with data array.
         /// \param data Data pointer.
         /// \param size Data size.
-        buffer(const T* data, size_t size)
-                : data_(nullptr), size_(0), capacity_(0) {
+        buffer(const T* data, std::size_t size)
+            : data_(nullptr), size_(0), capacity_(0) {
             assign(data, size);
         }
 
@@ -63,9 +56,16 @@ namespace stdex {
         /// \param data Data pointer.
         /// \param size Data size.
         /// \param capacity Capacity.
-        buffer(const T* data, size_t size, size_t capacity)
-                : data_(nullptr), size_(0), capacity_(0) {
+        buffer(const T* data, std::size_t size, std::size_t capacity)
+            : data_(nullptr), size_(0), capacity_(0) {
             assign(data, size, capacity);
+        }
+
+        /// Constructor with capacity.
+        /// \param capacity Capacity.
+        buffer(std::size_t capacity)
+            : data_(nullptr), size_(0), capacity_(0) {
+            assign(capacity);
         }
 
         /// Destructor.
@@ -76,14 +76,14 @@ namespace stdex {
         /// Returns an element at the specified index.
         /// \param index Index.
         /// \return Element at the specified index.
-        T& operator[](const size_t index) noexcept {
+        T& operator[](const std::size_t index) noexcept {
             return data()[index];
         }
 
         /// Returns an element at the specified index.
         /// \param index Index.
         /// \return Element at the specified index.
-        T operator[](const size_t index) const noexcept {
+        T operator[](const std::size_t index) const noexcept {
             return data()[index];
         }
 
@@ -91,7 +91,7 @@ namespace stdex {
         /// \param object Object to copy.
         /// \return This object.
         buffer& operator=(const buffer& object) {
-            assign(object);
+            if (&object != this) assign(object);
             return *this;
         }
 
@@ -137,7 +137,7 @@ namespace stdex {
 
         /// Assigns a capacity.
         /// \param capacity Capacity.
-        void assign(size_t capacity) {
+        void assign(std::size_t capacity) {
             if (capacity != capacity_)
                 assign(data_, size_, capacity);
         }
@@ -145,7 +145,7 @@ namespace stdex {
         /// Assigns a data array.
         /// \param data Data pointer.
         /// \param size Data size.
-        void assign(const T* data, size_t size) {
+        void assign(const T* data, std::size_t size) {
             assign(data, size, size);
         }
 
@@ -153,32 +153,28 @@ namespace stdex {
         /// \param data Data pointer.
         /// \param size Data size.
         /// \param capacity Capacity.
-        void assign(const T* data, size_t size, size_t capacity) {
+        void assign(const T* data, std::size_t size, std::size_t capacity) {
             size = capacity > size ? size : capacity;
 
-            auto tmp = capacity > 0 ? new T[capacity]() : nullptr;
+            std::unique_ptr<T[]> safe_tmp {
+                capacity > 0 ? new T[capacity]() : nullptr
+            };
 
-            if (tmp && data && size > 0)
-                std::copy(data, data + size, tmp);
+            if (safe_tmp && data && size > 0)
+                std::copy(data, data + size, safe_tmp.get());
 
-            std::swap(data_, tmp);
+            auto tmp = safe_tmp.release();
+            safe_tmp.reset(data_);
+            data_ = tmp;
+
             size_ = data_ ? size : 0;
             capacity_ = data_ ? capacity : 0;
-
-            delete[] tmp;
         }
 
         /// Appends an existing object.
         /// \param object Object to copy.
         void append(const buffer& object) {
             append(object.data_, object.size_);
-        }
-
-        /// Appends a temporary object.
-        /// \param object Object to move.
-        void append(buffer&& object) {
-            append(object.data_, object.size_);
-            object.clear();
         }
 
         /// Appends an initializer list.
@@ -196,30 +192,57 @@ namespace stdex {
         /// Appends a data array.
         /// \param data Data pointer.
         /// \param size Data size.
-        void append(const T* data, size_t size) {
-            append(data, size, size_);
+        void append(const T* data, std::size_t size) {
+            insert(data, size, size_);
         }
 
-        /// Appends a data array.
+        /// Inserts an existing object at the specified position.
+        /// \param object Object to copy.
+        /// \param position Insertion position.
+        void insert(const buffer& object, std::size_t position) {
+            insert(object.data_, object.size_, position);
+        }
+
+        /// Inserts an initializer list at the specified position.
+        /// \param list Initializer list.
+        /// \param position Insertion position.
+        void insert(const std::initializer_list<T>& list,
+                    std::size_t position) {
+
+            insert(list.begin(), list.size(), position);
+        }
+
+        /// Inserts a single value at the specified position.
+        /// \param value Value.
+        /// \param position Insertion position.
+        void insert(const T& value, std::size_t position) {
+            insert(&value, 1, position);
+        }
+
+        /// Inserts a data array at the specified position.
         /// \param data Data pointer.
         /// \param size Data size.
-        /// \param position Starting position.
-        void append(const T* data, size_t size, size_t position) {
-            auto capacity = size + position;
+        /// \param position Insertion position.
+        void insert(const T* data, std::size_t size, std::size_t position) {
+            if (position > size_)
+                throw std::invalid_argument(
+                    "the insertion position must be less than or equal to "
+                    "the size of the container");
+
+            auto capacity = size + size_;
             auto exceeds = capacity > capacity_;
-            auto tmp = exceeds ? new T[capacity]() : data_;
 
-            if (exceeds && tmp && data_ && position > 0)
-                std::copy(data_, data_ + position, tmp);
+            if (exceeds) assign(capacity);
 
-            if (tmp && data && size > 0)
-                std::copy(data, data + size, tmp + position);
+            if (data && size > 0) {
+                std::copy_backward(data_ + position,
+                                   data_ + size_,
+                                   data_ + capacity);
 
-            std::swap(data_, tmp);
-            size_ = capacity > size_ ? capacity : size_;
-            capacity_ = exceeds ? capacity : capacity_;
+                std::copy(data, data + size, data_ + position);
+            }
 
-            if (exceeds) delete[] tmp;
+            size_ = capacity;
         }
 
         /// Reduces container's capacity to fit its size.
@@ -241,7 +264,7 @@ namespace stdex {
         /// \param size Data size.
         /// \warning The function doesn't check if the data matches the size.
         /// Memory will be cleared as if it was allocated by operator new.
-        void acquire(T* data, size_t size) {
+        void acquire(T* data, std::size_t size) {
             acquire(data, size, size);
         }
 
@@ -252,8 +275,8 @@ namespace stdex {
         /// \throw std::invalid_argument if any of the arguments is null.
         /// \warning The function doesn't check if the data matches the size.
         /// Memory will be cleared as if it was allocated by operator new.
-        void acquire(T* data, size_t size, size_t capacity) {
-            if (!data || size <= 0 || size > capacity)
+        void acquire(T* data, std::size_t size, std::size_t capacity) {
+            if (!data || size == 0 || size > capacity)
                 throw std::invalid_argument("arguments are invalid");
 
             clear();
@@ -284,7 +307,7 @@ namespace stdex {
         /// \param index Index.
         /// \return Element at the specified index.
         /// \throw std::out_of_range if the index is out of range.
-        T& at(const size_t index) {
+        T& at(const std::size_t index) {
             if (index >= size_)
                 throw std::out_of_range("index is out of range");
 
@@ -295,7 +318,7 @@ namespace stdex {
         /// \param index Index.
         /// \return Element at the specified index.
         /// \throw std::out_of_range if the index is out of range.
-        T at(const size_t index) const {
+        T at(const std::size_t index) const {
             if (index >= size_)
                 throw std::out_of_range("index is out of range");
 
@@ -328,13 +351,13 @@ namespace stdex {
 
         /// Returns size.
         /// \return Size.
-        size_t size() const noexcept {
+        std::size_t size() const noexcept {
             return size_;
         }
 
         /// Returns capacity.
         /// \return Capacity.
-        size_t capacity() const noexcept {
+        std::size_t capacity() const noexcept {
             return capacity_;
         }
 
@@ -391,10 +414,10 @@ namespace stdex {
         T* data_;
 
         /// Buffer size.
-        size_t size_;
+        std::size_t size_;
 
         /// Buffer capacity.
-        size_t capacity_;
+        std::size_t capacity_;
     };
 
     /// Char buffer type.
@@ -423,7 +446,7 @@ namespace stdex {
     template <typename T>
     inline bool operator==(const buffer<T>& a, const buffer<T>& b) {
         return (a.size() == b.size()) &&
-                std::equal(a.begin(), a.end(), b.begin());
+               std::equal(a.begin(), a.end(), b.begin());
     }
 
     /// Equality operator.

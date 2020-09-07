@@ -6,7 +6,7 @@
 #define DELEGATE_HPP
 
 #include <algorithm>
-#include <deque>
+#include <list>
 
 /// Contains classes and functions that extend the C++ STL.
 namespace stdex {
@@ -23,7 +23,7 @@ namespace stdex {
     class delegate_base<R(P...)> {
     protected:
 
-        /// Type of the called function.
+        /// Callback function type.
         using function_type = R(*)(void*, P...);
 
         /// Internal class that stores pointers to an object and a function.
@@ -32,14 +32,14 @@ namespace stdex {
 
             /// Constructor without arguments.
             invocation() noexcept
-                    : object_(nullptr), function_(nullptr) {
+                : object_(nullptr), function_(nullptr) {
             }
 
             /// Constructor with pointers to an object and a function.
             /// \param object Object pointer.
             /// \param function Function pointer.
             invocation(void* object, const function_type function) noexcept
-                    : object_(object), function_(function) {
+                : object_(object), function_(function) {
             }
 
             /// Boolean operator.
@@ -123,26 +123,26 @@ namespace stdex {
     public:
 
         /// Constructor without arguments.
-        delegate() noexcept
-            : invocation_() {
+        delegate() noexcept : invocation_() {
         }
 
         /// Constructor with the lambda object.
         /// \tparam L Lambda type.
         /// \param object Object.
-        template<typename L>
+        template <typename L>
         delegate(const L& object) noexcept
-            : invocation_((void*)&object, lambda<L>) {
+            : invocation_() {
+            *this = object;
         }
 
         /// Assignment operator with the lambda object.
         /// \tparam L Lambda type.
         /// \param object Object.
         /// \return This object.
-        template<typename L>
+        template <typename L>
         delegate& operator=(const L& object) noexcept {
             invocation_ = typename delegate_base<R(P...)>::invocation(
-                (void*)&object, lambda<L>);
+                (void*) (&object), lambda < L > );
             return *this;
         }
 
@@ -210,9 +210,9 @@ namespace stdex {
         /// \tparam M Member function.
         /// \param object Object.
         /// \return Delegate that points to a member function.
-        template<typename T, R(T::*M)(P...)>
+        template <typename T, R(T::*M)(P...)>
         static delegate create(T& object) noexcept {
-            return delegate(&object, method<T, M>);
+            return delegate(&object, method < T, M > );
         }
 
         /// Returns a delegate that points to a const member function.
@@ -220,26 +220,26 @@ namespace stdex {
         /// \tparam M Const member function.
         /// \param object Object.
         /// \return Delegate that points to a const member function.
-        template<typename T, R(T::*M)(P...) const>
+        template <typename T, R(T::*M)(P...) const>
         static delegate create(const T& object) noexcept {
-            return delegate(const_cast<T*>(&object), const_method<T, M>);
+            return delegate(const_cast<T*>(&object), const_method < T, M > );
         }
 
         /// Returns a delegate that points to a free function.
         /// \tparam M Free function.
         /// \return Delegate that points to a free function.
-        template<R(* M)(P...)>
+        template <R(* M)(P...)>
         static delegate create() noexcept {
-            return delegate(nullptr, free_function<M>);
+            return delegate(nullptr, free_function < M > );
         }
 
         /// Returns a delegate that points to a lambda function.
         /// \tparam L Lambda type.
         /// \param object Object.
         /// \return Delegate that points to a lambda function.
-        template<typename L>
+        template <typename L>
         static delegate create(const L& object) noexcept {
-            return delegate((void*)&object, lambda<L>);
+            return delegate(&object, lambda < L > );
         }
 
         /// Returns a delegate that points to a member function.
@@ -247,9 +247,9 @@ namespace stdex {
         /// \tparam M Member function.
         /// \param object Object pointer.
         /// \return Delegate that points to a member function.
-        template<typename T, R(T::*M)(P...)>
+        template <typename T, R(T::*M)(P...)>
         static delegate create(T* object) noexcept {
-            return delegate(object, method<T, M>);
+            return delegate(object, method < T, M > );
         }
 
         /// Returns a delegate that points to a const member function.
@@ -257,9 +257,9 @@ namespace stdex {
         /// \tparam M Const member function.
         /// \param object Object pointer.
         /// \return Delegate that points to a const member function.
-        template<typename T, R(T::*M)(P...) const>
+        template <typename T, R(T::*M)(P...) const>
         static delegate create(const T* object) noexcept {
-            return delegate(const_cast<T*>(object), const_method<T, M>);
+            return delegate(const_cast<T*>(object), const_method < T, M > );
         }
 
     private:
@@ -269,7 +269,7 @@ namespace stdex {
         /// \param function Function.
         delegate(void* object,
                  typename delegate_base<R(P...)>::function_type function)
-                 noexcept : invocation_(object, function) {
+        noexcept : invocation_(object, function) {
         }
 
         /// Called a member function with the specified arguments.
@@ -278,7 +278,7 @@ namespace stdex {
         /// \param object Object.
         /// \param args Arguments.
         /// \return Return value of the function.
-        template<typename T, R(T::*M)(P...)>
+        template <typename T, R(T::*M)(P...)>
         static R method(void* object, P... args) {
             return (static_cast<T*>(object)->*M)(args...);
         }
@@ -289,7 +289,7 @@ namespace stdex {
         /// \param object Object.
         /// \param args Arguments.
         /// \return Return value of the function.
-        template<typename T, R(T::*M)(P...) const>
+        template <typename T, R(T::*M)(P...) const>
         static R const_method(void* object, P... args) {
             return (static_cast<const T*>(object)->*M)(args...);
         }
@@ -299,7 +299,7 @@ namespace stdex {
         /// \param object Object.
         /// \param args Arguments.
         /// \return Return value of the function.
-        template<R(* M)(P...)>
+        template <R(* M)(P...)>
         static R free_function(void* object, P... args) {
             return (M)(args...);
         }
@@ -309,7 +309,7 @@ namespace stdex {
         /// \param object Object.
         /// \param args Arguments.
         /// \return Return value of the function.
-        template<typename L>
+        template <typename L>
         static R lambda(void* object, P... args) {
             return (static_cast<L*>(object)->operator())(args...);
         }
@@ -328,9 +328,16 @@ namespace stdex {
     class multidelegate<R(P...)> final : delegate_base<R(P...)> {
     public:
 
+        /// Container type.
+        using container_type =
+        typename std::list<typename delegate_base<R(P...)>::invocation>;
+
+        /// Container size type.
+        using size_type = typename container_type::size_type;
+
         /// Constructor without arguments.
         multidelegate() noexcept
-                : invocations_() {
+            : invocations_() {
         }
 
         /// Boolean operator.
@@ -385,7 +392,7 @@ namespace stdex {
         /// \param object Multicast delegate to add.
         /// \return This object.
         multidelegate& operator+=(const multidelegate& object) {
-            for(const auto& invocation : object.invocations_)
+            for (const auto& invocation : object.invocations_)
                 invocations_.push_back(invocation);
             return *this;
         }
@@ -394,7 +401,7 @@ namespace stdex {
         /// \param object Delegate to add.
         /// \return This object.
         multidelegate& operator+=(const delegate<R(P...)>& object) {
-            if(object) invocations_.push_back(object.invocation_);
+            if (object) invocations_.push_back(object.invocation_);
             return *this;
         }
 
@@ -429,7 +436,7 @@ namespace stdex {
         /// The returned parameters are ignored.
         /// \param args Possible arguments of the functions.
         void operator()(P... args) const {
-            for(const auto& invocation : invocations_)
+            for (const auto& invocation : invocations_)
                 (*invocation.function())(invocation.object(), args...);
         }
 
@@ -440,8 +447,8 @@ namespace stdex {
         /// \param handler Callback handler.
         template <typename H>
         void operator()(P... args, H handler) const {
-            size_t index = 0;
-            for(const auto& invocation : invocations_) {
+            size_type index { 0 };
+            for (const auto& invocation : invocations_) {
                 R item = (*invocation.function())(invocation.object(), args...);
                 handler(index++, &item);
             }
@@ -455,7 +462,7 @@ namespace stdex {
 
         /// Returns the queue size.
         /// \return Queue size.
-        size_t size() const noexcept {
+        size_type size() const noexcept {
             return invocations_.size();
         }
 
@@ -467,7 +474,7 @@ namespace stdex {
     private:
 
         /// Storage of the invocations.
-        std::deque<typename delegate_base<R(P...)>::invocation> invocations_;
+        container_type invocations_;
     };
 }
 

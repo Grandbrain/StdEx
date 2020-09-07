@@ -8,28 +8,44 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <type_traits>
 
 /// Contains classes and functions that extend the C++ STL.
 namespace stdex {
 
+    /// A helper function overload that checks whether the type is a string
+    /// using expression SFINAE.
+    /// \tparam T Arbitrary type.
+    /// \return Value \c true.
+    template <typename T>
+    constexpr auto is_string_type(std::nullptr_t) -> decltype(
+    std::basic_string<typename T::value_type> { std::declval<T>() },
+        std::declval<T>().c_str() == nullptr,
+        true) {
+
+        return true;
+    }
+
+    /// A helper function overload that checks whether the type is a string.
+    /// \return Value \c false.
+    template <typename>
+    constexpr auto is_string_type(...) -> bool {
+        return false;
+    }
+
     /// A helper structure that checks whether the type is a string type.
     /// \tparam T Arbitrary type.
     template <typename T>
-    struct is_string {
+    struct is_string :
+        public std::integral_constant<bool, is_string_type<T>(nullptr)> {
 
-        /// The value indicates whether the type is a string type.
-        static constexpr bool value =
-            std::is_same<T, std::string>::value ||
-            std::is_same<T, std::wstring>::value;
-
-        /// The type involved in SFINAE checks.
-        using type = typename std::enable_if<value, T>::type;
     };
 
     /// Trims a string in left.
     /// \tparam T String type.
     /// \param[in,out] str String to trim.
-    template <typename T, typename = typename stdex::is_string<T>::type>
+    template <typename T, typename =
+    typename std::enable_if<is_string<T>::value, T>::type>
     inline void ltrim(T& str) {
         str.erase(str.begin(), std::find_if(str.begin(), str.end(), [](int ch) {
             return !std::isspace(ch);
@@ -39,7 +55,8 @@ namespace stdex {
     /// Trims a string in right.
     /// \tparam T String type.
     /// \param[in,out] str String to trim.
-    template <typename T, typename = typename stdex::is_string<T>::type>
+    template <typename T, typename =
+    typename std::enable_if<is_string<T>::value, T>::type>
     inline void rtrim(T& str) {
         str.erase(std::find_if(str.rbegin(), str.rend(), [](int ch) {
             return !std::isspace(ch);
@@ -49,7 +66,8 @@ namespace stdex {
     /// Trims a string.
     /// \tparam T String type.
     /// \param[in,out] str String to trim.
-    template <typename T, typename = typename stdex::is_string<T>::type>
+    template <typename T, typename =
+    typename std::enable_if<is_string<T>::value, T>::type>
     inline void trim(T& str) {
         ltrim(str);
         rtrim(str);
@@ -59,7 +77,8 @@ namespace stdex {
     /// \tparam T String type.
     /// \param str String to trim.
     /// \return Trimmed string.
-    template <typename T, typename = typename stdex::is_string<T>::type>
+    template <typename T, typename =
+    typename std::enable_if<is_string<T>::value, T>::type>
     inline T ltrim_copy(T str) {
         ltrim(str);
         return str;
@@ -69,7 +88,8 @@ namespace stdex {
     /// \tparam T String type.
     /// \param str String to trim.
     /// \return Trimmed string.
-    template <typename T, typename = typename stdex::is_string<T>::type>
+    template <typename T, typename =
+    typename std::enable_if<is_string<T>::value, T>::type>
     inline T rtrim_copy(T str) {
         rtrim(str);
         return str;
@@ -79,7 +99,8 @@ namespace stdex {
     /// \tparam T String type.
     /// \param str String to trim.
     /// \return Trimmed string.
-    template <typename T, typename = typename stdex::is_string<T>::type>
+    template <typename T, typename =
+    typename std::enable_if<is_string<T>::value, T>::type>
     inline T trim_copy(T str) {
         trim(str);
         return str;
@@ -92,7 +113,7 @@ namespace stdex {
     /// \param delims Delimiters.
     /// \param[out] lines Output list of strings.
     template <typename T, typename C = typename T::value_type,
-        typename = typename stdex::is_string<T>::type>
+        typename = typename std::enable_if<is_string<T>::value, T>::type>
     inline void split(const T& str,
                       const std::initializer_list<C>& delims,
                       std::vector<T>& lines) {
@@ -124,7 +145,7 @@ namespace stdex {
     /// \param delims Delimiters.
     /// \return Output list of strings.
     template <typename T, typename C = typename T::value_type,
-        typename = typename stdex::is_string<T>::type>
+        typename = typename std::enable_if<is_string<T>::value, T>::type>
     inline std::vector<T> split_copy(const T& str,
                                      const std::initializer_list<C>& delims) {
 
@@ -132,6 +153,6 @@ namespace stdex {
         split(str, delims, lines);
         return lines;
     }
-};
+}
 
 #endif

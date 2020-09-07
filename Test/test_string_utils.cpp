@@ -1,6 +1,5 @@
 #include <catch.hpp>
 #include <string_utils.hpp>
-#include <iostream>
 
 // Testing of string utilites.
 TEST_CASE("Testing of string utilites") {
@@ -60,7 +59,7 @@ TEST_CASE("Testing of string utilites") {
     // Testing of splitting.
     SECTION("Splitting") {
         std::string str("a b\nc");
-        std::initializer_list<std::string::value_type> delims {' ', '\n'};
+        std::initializer_list<std::string::value_type> delims { ' ', '\n' };
         std::vector<std::string> lines;
         stdex::split(str, delims, lines);
         REQUIRE(lines.size() == 3);
